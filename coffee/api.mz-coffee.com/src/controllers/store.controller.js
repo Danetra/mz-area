@@ -196,7 +196,7 @@ let storeController = {
           totalDocs: totalDocs,
           page: page,
           limit: parseInt(req.query.limit),
-          totalPage: Math.floor(totalDocs / parseInt(req.query.limit) + 1),
+          totalPage: Math.floor(totalDocs / parseInt(req.query.limit)),
         },
       });
     } catch (error) {
