@@ -1,6 +1,12 @@
 import * as Yup from "yup";
 import Address from "../models/Address";
+import User from "../models/User";
+import Province from "../models/Province";
+import City from "../models/City";
+import District from "../models/District";
+import Village from "../models/Village";
 import Store from "../models/Store";
+import { Op, Sequelize } from "sequelize";
 import {
   BadRequestError,
   UnauthorizedError,
@@ -24,11 +30,11 @@ let storeController = {
 
       let { name } = req.body;
 
-      const storeExists = await Store.findOne({
+      const storeExists = await Store.count({
         where: { name },
       });
 
-      if (storeExists && storeExists.length > 0) {
+      if (storeExists > 0) {
         const response = {
           status: 400,
           message: "Store is Existed",
@@ -45,8 +51,6 @@ let storeController = {
         updatedBy: updatedBy,
       };
 
-      console.log(insert);
-
       const store = await Store.create(insert);
 
       const callback = {
@@ -61,9 +65,140 @@ let storeController = {
   },
   get: async (req, res, next) => {
     try {
-      const users = await User.findAll();
+      const page = req.query.page ? parseInt(req.query.page) : null;
+      const totalDocs = await Store.count();
+      console.log(totalDocs, "test total");
+      console.log(req.query, "test query");
 
-      return res.status(200).json(users);
+      const pagination = () => {
+        if (req.query.paginate === "true") {
+          const limit = req.query.limit ? parseInt(req.query.limit) : 10;
+          const offset = limit * (page - 1);
+          const totalPage = totalDocs;
+
+          return {
+            page,
+            offset,
+            limit,
+            totalPage,
+            order: [["createdAt", "DESC"]],
+            include: [
+              {
+                model: User,
+                as: "owner",
+              },
+              {
+                model: User,
+                as: "created",
+              },
+              {
+                model: User,
+                as: "updated",
+              },
+              {
+                model: User,
+                as: "deleted",
+              },
+              {
+                model: Province,
+                as: "province",
+              },
+              {
+                model: City,
+                as: "city",
+              },
+              {
+                model: District,
+                as: "district",
+              },
+              {
+                model: Village,
+                as: "village",
+              },
+            ],
+          };
+        } else {
+          let query = {};
+          Object.keys(req.query)
+            .filter((item) => item != "paginate")
+            .map((item) => {
+              query = {
+                ...query,
+                [item]: {
+                  [Op.iLike]: `%${req.query[item]}%`,
+                },
+              };
+            });
+
+          return {
+            where: {
+              ...query,
+            },
+            include: [
+              {
+                model: User,
+                as: "owner",
+              },
+              {
+                model: User,
+                as: "created",
+              },
+              {
+                model: User,
+                as: "updated",
+              },
+              {
+                model: User,
+                as: "deleted",
+              },
+              {
+                model: Province,
+                as: "province",
+              },
+              {
+                model: City,
+                as: "city",
+              },
+              {
+                model: District,
+                as: "district",
+              },
+              {
+                model: Village,
+                as: "village",
+              },
+            ],
+          };
+        }
+      };
+
+      const data = await Store.findAll(pagination());
+
+      const stores = data.map((store) => ({
+        id: store.id,
+        name: store.name,
+        description: store.description,
+        address: store.address,
+        official: store.official,
+        owner: store.owner.name,
+        created: store.created.name,
+        updated: store.updated.name,
+        deleted: store.deleted === null ? null : store.deleted.name,
+        province: store.province.name,
+        city: store.city.name,
+        district: store.district.name,
+        village: store.village.name,
+      }));
+
+      return res.status(200).json({
+        data: {
+          docs: stores,
+          totalDocs: totalDocs,
+          page: page,
+          limit: parseInt(req.query.limit),
+          totalPage: Math.floor(totalDocs / parseInt(req.query.limit) + 1),
+        },
+      });
     } catch (error) {
       next(error);
     }
