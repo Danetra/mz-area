@@ -1,11 +1,14 @@
 import Sequelize, { Model } from "sequelize";
 
-class DeliveryTypes extends Model {
+class District extends Model {
   static init(sequelize) {
     super.init(
       {
         name: Sequelize.STRING,
-        slug: Sequelize.STRING,
+        cityId: Sequelize.BIGINT,
+        altName: Sequelize.STRING,
+        latitude: Sequelize.STRING,
+        longitude: Sequelize.STRING,
       },
       {
         sequelize,
@@ -17,11 +20,8 @@ class DeliveryTypes extends Model {
   }
 
   static associate(models) {
-    this.belongsToMany(models.User, {
-      through: "Payments",
-      foreignKey: "deliveryTypesId",
-    });
+    this.belongsTo(models.City, { foreignKey: "cityId" });
   }
 }
 
-export default DeliveryTypes;
+export default District;

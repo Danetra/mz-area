@@ -18,12 +18,12 @@ class Province extends Model {
     return this;
   }
 
-  static associate(models) {
-    this.belongsToMany(models.User, {
-      through: "City",
-      foreignKey: "provinceId",
-    });
-  }
+  // static associate(models) {
+  //   this.belongsToMany(models.User, {
+  //     through: "City",
+  //     foreignKey: "provinceId",
+  //   });
+  // }
 }
 
 export default Province;

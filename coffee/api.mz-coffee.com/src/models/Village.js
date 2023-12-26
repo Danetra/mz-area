@@ -4,9 +4,8 @@ class Village extends Model {
   static init(sequelize) {
     super.init(
       {
-        name: Sequelize.STRING,
         districtId: Sequelize.BIGINT,
-        altName: Sequelize.STRING,
+        name: Sequelize.STRING,
         latitude: Sequelize.STRING,
         longitude: Sequelize.STRING,
       },

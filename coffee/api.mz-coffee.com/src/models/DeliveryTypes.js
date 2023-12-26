@@ -15,13 +15,6 @@ class DeliveryTypes extends Model {
 
     return this;
   }
-
-  static associate(models) {
-    this.belongsToMany(models.User, {
-      through: "Payments",
-      foreignKey: "deliveryTypesId",
-    });
-  }
 }
 
 export default DeliveryTypes;

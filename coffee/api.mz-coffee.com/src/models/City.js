@@ -5,7 +5,7 @@ class City extends Model {
     super.init(
       {
         name: Sequelize.STRING,
-        provinceId: Sequelize.INTEGER,
+        provinceId: Sequelize.BIGINT,
         altName: Sequelize.STRING,
         latitude: Sequelize.STRING,
         longitude: Sequelize.STRING,
@@ -21,10 +21,6 @@ class City extends Model {
 
   static associate(models) {
     this.belongsTo(models.Province, { foreignKey: "provinceId" });
-    this.belongsToMany(models.User, {
-      through: "District",
-      foreignKey: "cityId",
-    });
   }
 }
 

@@ -1,4 +1,9 @@
 import Sequelize, { Model } from "sequelize";
+import User from "./User";
+import Province from "./Province";
+import City from "./City";
+import District from "./District";
+import Village from "./Village";
 
 class Store extends Model {
   static init(sequelize) {
@@ -13,25 +18,32 @@ class Store extends Model {
         official: Sequelize.INTEGER,
         address: Sequelize.TEXT,
         description: Sequelize.TEXT,
-        createdBy: Sequelize.STRING,
-        updatedBy: Sequelize.STRING,
-        deletedBy: Sequelize.STRING,
+        createdBy: Sequelize.INTEGER,
+        updatedBy: Sequelize.INTEGER,
+        deletedBy: Sequelize.INTEGER,
       },
       {
         sequelize,
         timestamps: true,
       }
     );
-
-    return this;
   }
 
   static associate(models) {
-    this.belongsTo(models.User, { foreignKey: "userId" });
-    this.belongsTo(models.Province, { foreignKey: "provinceId" });
-    this.belongsTo(models.City, { foreignKey: "cityId" });
-    this.belongsTo(models.District, { foreignKey: "districtId" });
-    this.belongsTo(models.Village, { foreignKey: "villageId" });
+    Store.belongsTo(User, { foreignKey: "userId", as: "owner" });
+    Store.belongsTo(User, { foreignKey: "createdBy", as: "created" });
+    Store.belongsTo(User, { foreignKey: "updatedBy", as: "updated" });
+    Store.belongsTo(User, { foreignKey: "deletedBy", as: "deleted" });
+    Store.belongsTo(Province, {
+      foreignKey: "provinceId",
+      as: "province",
+    });
+    Store.belongsTo(City, { foreignKey: "cityId", as: "city" });
+    Store.belongsTo(District, {
+      foreignKey: "districtId",
+      as: "district",
+    });
+    Store.belongsTo(Village, { foreignKey: "villageId", as: "village" });
   }
 }
 
