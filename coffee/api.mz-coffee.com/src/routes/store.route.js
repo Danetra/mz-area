@@ -3,10 +3,31 @@ import { Router } from "express";
 import storeController from "../controllers/store.controller";
 import authMiddleware from "../middlewares/auth.middleware";
 
-const urlAwal = "/api/v1";
+const publicUrl = "/api/v1";
+const adminUrl = "/api/v1/admin";
 const storeRoutes = Router();
 
-storeRoutes.get(`${urlAwal}/store/`, storeController.get);
-storeRoutes.post(`${urlAwal}/store/add`, storeController.add);
+// Public
+storeRoutes.get(`${publicUrl}/store/`, storeController.get);
+storeRoutes.get(`${publicUrl}/store/detail/:id`, storeController.detail);
+
+// Admin
+storeRoutes.get(`${adminUrl}/store/`, authMiddleware, storeController.get);
+storeRoutes.post(`${adminUrl}/store/add`, authMiddleware, storeController.add);
+storeRoutes.get(
+  `${adminUrl}/store/detail/:id`,
+  authMiddleware,
+  storeController.detail
+);
+storeRoutes.put(
+  `${adminUrl}/store/update`,
+  authMiddleware,
+  storeController.update
+);
+storeRoutes.delete(
+  `${adminUrl}/store/delete/:id`,
+  authMiddleware,
+  storeController.delete
+);
 
 export { storeRoutes };

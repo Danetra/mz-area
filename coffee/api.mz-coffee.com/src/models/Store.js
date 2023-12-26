@@ -20,6 +20,7 @@ class Store extends Model {
         description: Sequelize.TEXT,
         createdBy: Sequelize.INTEGER,
         updatedBy: Sequelize.INTEGER,
+        deletedAt: Sequelize.DATE,
         deletedBy: Sequelize.INTEGER,
       },
       {
