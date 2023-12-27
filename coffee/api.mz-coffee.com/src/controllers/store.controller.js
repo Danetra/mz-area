@@ -68,8 +68,6 @@ let storeController = {
     try {
       const page = req.query.page ? parseInt(req.query.page) : null;
       const totalDocs = await Store.count();
-      console.log(totalDocs, "test total");
-      console.log(req.query, "test query");
 
       const pagination = () => {
         if (req.query.paginate === "true") {
@@ -293,7 +291,6 @@ let storeController = {
       const { id } = req.body;
 
       const store = await Store.findByPk(id);
-      console.log(store);
 
       const updated = await store.update(req.body);
 
