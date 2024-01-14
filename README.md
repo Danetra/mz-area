@@ -13,12 +13,7 @@ URL untuk testing
 https://red-eclipse-80450.postman.co/workspace/MZ-Area~766592f4-6b88-4552-8c13-e548cadd093d/collection/21736836-1bd04f69-09da-4a13-8f25-eb04fabf7430?action=share&creator=21736836
 ```
 
-Enter into the directory
-```bash
-cd express-sequelize-boilerplate/
-```
-
-## Postman
+## Step By Step
 
 Install the dependencies
 ```bash
