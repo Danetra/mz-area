@@ -1,9 +1,8 @@
 # MZ Area Project
 
+URL Production:
 [FRONTEND](http://mz-area.com/)
 [BACKEND](http://api.mz-area.com/)
-
-This is a simple boilerplate for building REST APIs in Node.js using Express. Intended for use with PostgreSQL using Sequelize ORM.
 
 
 ## Getting Started
