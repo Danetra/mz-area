@@ -7,11 +7,11 @@ class SubCategory extends Model {
       {
         categoryId: Sequelize.INTEGER,
         name: Sequelize.STRING,
-        slug: Sequelize.STRING,
       },
       {
         sequelize,
         timestamps: true,
+        tableName: "SubCategoryProducts",
       }
     );
 

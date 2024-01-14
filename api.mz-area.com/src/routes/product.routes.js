@@ -8,8 +8,15 @@ const adminUrl = "/api/v1/admin";
 const productRoutes = Router();
 
 // Public
-productRoutes.get(`${publicUrl}/products/`, productController.getPublic);
-// productRoutes.get(`${publicUrl}/product/detail/:id`, productController.detail);
+productRoutes.get(`${publicUrl}/products/`, productController.get);
+productRoutes.get(
+  `${publicUrl}/products/detail/:id`,
+  productController.getProductById
+);
+productRoutes.get(
+  `${publicUrl}/products/edit/:id`,
+  productController.getProductById
+);
 
 // Admin
 productRoutes.get(
@@ -23,16 +30,24 @@ productRoutes.post(
   productController.add
 );
 
-// productRoutes.get(
-//   `${adminUrl}/products/detail/:id`,
-//   authMiddleware,
-//   productController.detail
-// );
-// productRoutes.put(
-//   `${adminUrl}/products/update`,
-//   authMiddleware,
-//   productController.update
-// );
+productRoutes.get(
+  `${adminUrl}/products/detail/:id`,
+  authMiddleware,
+  productController.getProductById
+);
+
+productRoutes.get(
+  `${adminUrl}/products/edit/:id`,
+  authMiddleware,
+  productController.getProductById
+);
+
+productRoutes.put(
+  `${adminUrl}/products/update`,
+  authMiddleware,
+  productController.updateProduct
+);
+
 // productRoutes.delete(
 //   `${adminUrl}/products/delete/:id`,
 //   authMiddleware,

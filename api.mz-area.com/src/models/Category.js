@@ -9,7 +9,7 @@ class Category extends Model {
       {
         sequelize,
         timestamps: true,
-        tableName: "Categories",
+        tableName: "CategoryProducts",
       }
     );
 

@@ -10,6 +10,7 @@ class Store extends Model {
     super.init(
       {
         name: Sequelize.STRING,
+        slug: Sequelize.STRING,
         userId: Sequelize.INTEGER,
         provinceId: Sequelize.BIGINT,
         cityId: Sequelize.BIGINT,

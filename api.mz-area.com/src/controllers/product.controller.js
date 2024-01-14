@@ -1,10 +1,6 @@
 import * as Yup from "yup";
 import Address from "../models/Address";
 import User from "../models/User";
-import Province from "../models/Province";
-import City from "../models/City";
-import District from "../models/District";
-import Village from "../models/Village";
 import Store from "../models/Store";
 import Category from "../models/Category";
 import SubCategory from "../models/SubCategory";
@@ -13,6 +9,8 @@ import ProductImages from "../models/ProductImage";
 
 import multer from "multer";
 import path from "path";
+import fs from "fs";
+import url from "url";
 
 import { Op, Sequelize } from "sequelize";
 import {
@@ -27,7 +25,7 @@ const images = [];
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "public/img/products");
+    cb(null, "public/assets/img/products");
   },
   filename: (req, file, cb) => {
     const newFileName = `${timestamp}_${file.originalname}`;
@@ -211,21 +209,53 @@ let productController = {
 
       const data = await Product.findAll(pagination());
 
-      const products = data.map((product) => ({
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        address: product.address,
-        official: product.official,
-        owner: product.owner.name,
-        created: product.created === null ? null : product.created.name,
-        updated: product.updated === null ? null : product.updated.name,
-        deleted: product.deleted === null ? null : product.deleted.name,
-        province: product.province.name,
-        city: product.city.name,
-        district: product.district.name,
-        village: product.village.name,
-      }));
+      const products = await Promise.all(
+        data.map(async (product) => {
+          const images = await ProductImages.findAll({
+            where: { productId: product.id },
+          });
+
+          const imagesUrl = images.map((image) => {
+            const imageUrl = url.resolve(
+              req.protocol + "://" + req.get("host"),
+              `/assets/img/products/${image.name}`
+            );
+
+            const formImage = {
+              id: image.id,
+              url: imageUrl,
+            };
+            return formImage;
+          });
+
+          const full = {
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            price: product.price,
+            description: product.description,
+            published: product.published === 1 ? "PUBLISHED" : "DRAFT",
+            images: imagesUrl,
+            store: {
+              name: product.store === null ? null : product.store.name,
+              slug: product.store === null ? null : product.store.slug,
+              official: product.store.official,
+              address: product.store.address,
+              province: product.store.provinceId,
+              city: product.store.cityId,
+              district: product.store.districtId,
+              village: product.store.villageId,
+            },
+            created: product.created === null ? null : product.created.name,
+            updated: product.updated === null ? null : product.updated.name,
+            deleted: product.deleted === null ? null : product.deleted.name,
+          };
+
+          return full;
+        })
+      );
+
+      // console.log(products);
 
       return res.status(200).json({
         data: {
@@ -241,225 +271,154 @@ let productController = {
     }
   },
 
-  getPublic: async (req, res, next) => {
+  getProductById: async (req, res, next) => {
     try {
-      const page = req.query.page ? parseInt(req.query.page) : null;
-      const totalDocs = await Product.count();
+      const { id } = req.params;
 
-      const pagination = () => {
-        if (req.query.paginate === "true") {
-          const limit = req.query.limit ? parseInt(req.query.limit) : 10;
-          const offset = limit * (page - 1);
-          const totalPage = totalDocs;
+      const data = await Product.findAll({
+        where: { id: id },
+        include: [
+          {
+            model: Store,
+            as: "store",
+          },
+          {
+            model: Category,
+            as: "category",
+          },
+          {
+            model: SubCategory,
+            as: "subcategory",
+          },
+          {
+            model: User,
+            as: "created",
+          },
+          {
+            model: User,
+            as: "updated",
+          },
+          {
+            model: User,
+            as: "deleted",
+          },
+        ],
+      });
 
-          return {
-            page,
-            offset,
-            limit,
-            totalPage,
-            where: {
-              deletedAt: null,
-              deletedBy: null,
+      if (!data)
+        return res
+          .status(404)
+          .send({ status: 404, message: "Product is Not Exist" });
+
+      data.map((store) => {
+        if (store.deletedAt != null || store.deletedBy != null)
+          return res
+            .status(400)
+            .send({ status: 404, message: "Product was deleted" });
+      });
+
+      const products = await Promise.all(
+        data.map(async (product) => {
+          const images = await ProductImages.findAll({
+            where: { productId: product.id },
+          });
+
+          const imagesUrl = images.map((image) => {
+            const imageUrl = url.resolve(
+              req.protocol + "://" + req.get("host"),
+              `/assets/img/products/${image.name}`
+            );
+            return imageUrl;
+          });
+
+          const full = {
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            price: product.price,
+            description: product.description,
+            published: product.published === 1 ? "PUBLISHED" : "DRAFT",
+            images: imagesUrl,
+            store: {
+              name: product.store === null ? null : product.store.name,
+              slug: product.store === null ? null : product.store.slug,
+              official: product.store.official,
+              address: product.store.address,
+              province: product.store.provinceId,
+              city: product.store.cityId,
+              district: product.store.districtId,
+              village: product.store.villageId,
             },
-            order: [["createdAt", "DESC"]],
-            include: [
-              {
-                model: Store,
-                as: "store",
-              },
-              {
-                model: Category,
-                as: "category",
-              },
-              {
-                model: SubCategory,
-                as: "subcategory",
-              },
-              {
-                model: User,
-                as: "created",
-              },
-              {
-                model: User,
-                as: "updated",
-              },
-              {
-                model: User,
-                as: "deleted",
-              },
-            ],
+            created: product.created === null ? null : product.created.name,
+            updated: product.updated === null ? null : product.updated.name,
+            deleted: product.deleted === null ? null : product.deleted.name,
           };
-        } else {
-          let query = {};
-          Object.keys(req.query)
-            .filter((item) => item != "paginate")
-            .map((item) => {
-              query = {
-                ...query,
-                [item]: {
-                  [Op.iLike]: `%${req.query[item]}%`,
-                },
-              };
-            });
 
-          return {
-            where: {
-              ...query,
-            },
-            include: [
-              {
-                model: Store,
-                as: "store",
-              },
-              {
-                model: Category,
-                as: "category",
-              },
-              {
-                model: SubCategory,
-                as: "subcategory",
-              },
-              {
-                model: User,
-                as: "created",
-              },
-              {
-                model: User,
-                as: "updated",
-              },
-              {
-                model: User,
-                as: "deleted",
-              },
-            ],
-          };
-        }
-      };
+          return full;
+        })
+      );
 
-      const data = await Product.findAll(pagination());
-
-      // const products = data.map((product) => ({
-      //   id: product.id,
-      //   name: product.name,
-      //   description: product.description,
-      //   address: product.address,
-      //   official: product.official,
-      //   owner: product.owner.name,
-      //   created: product.created === null ? null : product.created.name,
-      //   updated: product.updated === null ? null : product.updated.name,
-      //   deleted: product.deleted === null ? null : product.deleted.name,
-      //   province: product.province.name,
-      //   city: product.city.name,
-      //   district: product.district.name,
-      //   village: product.village.name,
-      // }));
-
-      // return res.status(200).json({
-      //   data: {
-      //     docs: products,
-      //     totalDocs: totalDocs,
-      //     page: page,
-      //     limit: parseInt(req.query.limit),
-      //     totalPage: Math.floor(totalDocs / parseInt(req.query.limit)),
-      //   },
-      // });
+      return res.status(200).send({
+        status: 200,
+        data: products,
+      });
     } catch (error) {
       next(error);
     }
   },
 
-  //   detail: async (req, res, next) => {
-  //     try {
-  //       const { id } = req.params;
+  updateProduct: async (req, res, next) => {
+    try {
+      upload(req, res, async (err) => {
+        if (err) {
+          // Tangani error upload file, jika ada
+          return res.status(400).json({ error: "File upload error." });
+        }
 
-  //       const data = await Store.findAll({
-  //         where: { id: id },
-  //         include: [
-  //           {
-  //             model: User,
-  //             as: "owner",
-  //           },
-  //           {
-  //             model: User,
-  //             as: "created",
-  //           },
-  //           {
-  //             model: User,
-  //             as: "updated",
-  //           },
-  //           {
-  //             model: User,
-  //             as: "deleted",
-  //           },
-  //           {
-  //             model: Province,
-  //             as: "province",
-  //           },
-  //           {
-  //             model: City,
-  //             as: "city",
-  //           },
-  //           {
-  //             model: District,
-  //             as: "district",
-  //           },
-  //           {
-  //             model: Village,
-  //             as: "village",
-  //           },
-  //         ],
-  //       });
+        const { id, imagesLatestId, imagesNew } = req.body;
+        const updatedBy = parseInt(req.body.userId);
 
-  //       if (!data)
-  //         return res
-  //           .status(404)
-  //           .send({ status: 404, message: "Store is Not Exist" });
+        const data = await Product.findByPk(id);
 
-  //       data.map((store) => {
-  //         if (store.deletedAt != null || store.deletedBy != null)
-  //           return res
-  //             .status(400)
-  //             .send({ status: 404, message: "Store was deleted" });
-  //       });
+        const updateProduct = {
+          ...req.body,
+          updatedBy: updatedBy,
+          updatedAt: new Date(),
+        };
 
-  //       const stores = data.map((store) => ({
-  //         id: store.id,
-  //         name: store.name,
-  //         description: store.description,
-  //         address: store.address,
-  //         official: store.official,
-  //         owner: store.owner.name,
-  //         created: store.created.name,
-  //         updated: store.updated.name,
-  //         deleted: store.deleted === null ? null : store.deleted.name,
-  //         province: store.province.name,
-  //         city: store.city.name,
-  //         district: store.district.name,
-  //         village: store.village.name,
-  //       }));
+        const product = await data.update(updateProduct);
 
-  //       return res.status(200).send({
-  //         status: 200,
-  //         data: stores,
-  //       });
-  //     } catch (error) {
-  //       next(error);
-  //     }
-  //   },
+        if (imagesLatestId) {
+          const imageProm = await Promise.all(
+            images.map(async (imageName) => {
+              const formImage = {
+                name: imageName,
+                updatedBy: updatedBy,
+                updatedAt: new Date(),
+              };
 
-  //   update: async (req, res, next) => {
-  //     try {
-  //       const { id } = req.body;
+              const existingImage = await ProductImages.findByPk(
+                imagesLatestId
+              );
 
-  //       const store = await Store.findByPk(id);
+              if (existingImage) {
+                const updatedImage = await existingImage.update(formImage);
+              }
+            })
+          );
+        }
 
-  //       const updated = await store.update(req.body);
+        const callback = {
+          status: 200,
+          message: "Update Success",
+        };
 
-  //       return res.status(200).json({ status: 200, message: "Update Success" });
-  //     } catch (error) {
-  //       next(error);
-  //     }
-  //   },
+        return res.status(200).json(callback);
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 
   //   delete: async (req, res, next) => {
   //     try {

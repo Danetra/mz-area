@@ -4,6 +4,10 @@ import Store from "./Store";
 import Category from "./Category";
 import SubCategory from "./SubCategory";
 import ProductImages from "./ProductImage";
+import Province from "./Province";
+import City from "./City";
+import District from "./District";
+import Village from "./Village";
 
 class Product extends Model {
   static init(sequelize) {

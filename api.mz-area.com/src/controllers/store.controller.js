@@ -6,6 +6,7 @@ import City from "../models/City";
 import District from "../models/District";
 import Village from "../models/Village";
 import Store from "../models/Store";
+import Product from "../models/Product";
 import { Op, Sequelize } from "sequelize";
 import {
   BadRequestError,
@@ -211,7 +212,7 @@ let storeController = {
     try {
       const { id } = req.params;
 
-      const data = await Store.findAll({
+      const store = await Store.findAll({
         where: { id: id },
         include: [
           {
@@ -249,19 +250,35 @@ let storeController = {
         ],
       });
 
-      if (!data)
+      if (!store)
         return res
           .status(404)
           .send({ status: 404, message: "Store is Not Exist" });
 
-      data.map((store) => {
+      store.map((store) => {
         if (store.deletedAt != null || store.deletedBy != null)
           return res
             .status(400)
             .send({ status: 404, message: "Store was deleted" });
       });
 
-      const stores = data.map((store) => ({
+      const products = await Product.findAll({ where: { storeId: id } });
+
+      const product = products.map((product) => ({
+        id: product.id,
+        name: product.name,
+        altName: product.altName,
+        slug: product.slug,
+        description: product.description,
+        price: product.price,
+        published: product.published === 1 ? "PUBLISHED" : "DRAFT",
+        status: product.status === 1 ? "READY" : "UNREADY",
+        createdAt: product.createdAt,
+        modifiedAt:
+          product.updatedAt === product.createdAt ? null : product.updatedAt,
+      }));
+
+      const stores = store.map((store) => ({
         id: store.id,
         name: store.name,
         description: store.description,
@@ -275,6 +292,7 @@ let storeController = {
         city: store.city.name,
         district: store.district.name,
         village: store.village.name,
+        products: product,
       }));
 
       return res.status(200).send({

@@ -30,6 +30,7 @@ const expressService = {
       server = express();
       server.locals.moment = moment;
       server.locals.moment.tz.setDefault("Asia/Jakarta");
+      server.use(express.static("public"));
       server.use(bodyParser.urlencoded({ extended: false }));
       server.use(bodyParser.json());
       server.use(routes);
