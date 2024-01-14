@@ -20,14 +20,14 @@ Install the dependencies
 yarn
 ```
 
-Set the environment variables
-```bash
-cp .env.example .env
-```
-
-Running the boilerplate:
+Running Back End:
 ```bash
 yarn dev
+```
+
+Running Front End:
+```bash
+yarn start
 ```
 
 ## Commands for sequelize 
