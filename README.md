@@ -18,6 +18,8 @@ Enter into the directory
 cd express-sequelize-boilerplate/
 ```
 
+## Postman
+
 Install the dependencies
 ```bash
 yarn
