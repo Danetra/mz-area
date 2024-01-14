@@ -4,6 +4,7 @@ class Address extends Model {
   static init(sequelize) {
     super.init(
       {
+        userId: Sequelize.INTEGER,
         provinceId: Sequelize.INTEGER,
         cityId: Sequelize.INTEGER,
         districtId: Sequelize.INTEGER,
@@ -19,10 +20,7 @@ class Address extends Model {
   }
 
   static associate(models) {
-    this.belongsToMany(models.User, {
-      through: "UserAddress",
-      foreignKey: "addressId",
-    });
+    this.belongsTo(models.User, { foreignKey: "userId" });
   }
 }
 

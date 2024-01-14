@@ -1,5 +1,4 @@
 import Sequelize, { Model } from "sequelize";
-
 class Category extends Model {
   static init(sequelize) {
     super.init(
@@ -10,6 +9,7 @@ class Category extends Model {
       {
         sequelize,
         timestamps: true,
+        tableName: "Categories",
       }
     );
 

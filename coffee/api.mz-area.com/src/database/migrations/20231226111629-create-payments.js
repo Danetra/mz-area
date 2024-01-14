@@ -20,7 +20,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "Categories",
+          model: "Products",
           key: "id",
         },
       },
@@ -28,15 +28,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "Categories",
-          key: "id",
-        },
-      },
-      deliveryTypesId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: "DeliveryTypes",
+          model: "CategoryProducts",
           key: "id",
         },
       },
@@ -47,6 +39,10 @@ module.exports = {
           model: "PaymentTypes",
           key: "id",
         },
+      },
+      qty: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
       },
       status: {
         allowNull: false,

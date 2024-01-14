@@ -2,6 +2,7 @@ import Sequelize, { Model } from "sequelize";
 import User from "./User";
 import Store from "./Store";
 import Category from "./Category";
+import SubCategory from "./SubCategory";
 import ProductImages from "./ProductImage";
 
 class Product extends Model {
@@ -10,6 +11,7 @@ class Product extends Model {
       {
         storeId: Sequelize.INTEGER,
         categoryId: Sequelize.INTEGER,
+        subCategoryId: Sequelize.INTEGER,
         name: Sequelize.STRING,
         slug: Sequelize.STRING,
         altName: Sequelize.STRING,
@@ -26,6 +28,7 @@ class Product extends Model {
       {
         sequelize,
         timestamps: true,
+        tableName: "Products",
       }
     );
   }
@@ -33,6 +36,10 @@ class Product extends Model {
   static associate(models) {
     Product.belongsTo(Store, { foreignKey: "storeId", as: "store" });
     Product.belongsTo(Category, { foreignKey: "categoryId", as: "category" });
+    Product.belongsTo(SubCategory, {
+      foreignKey: "subCategoryId",
+      as: "subcategory",
+    });
     Product.belongsTo(User, { foreignKey: "createdBy", as: "created" });
     Product.belongsTo(User, { foreignKey: "updatedBy", as: "updated" });
     Product.belongsTo(User, { foreignKey: "deletedBy", as: "deleted" });

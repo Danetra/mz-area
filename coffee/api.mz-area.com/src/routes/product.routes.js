@@ -8,7 +8,7 @@ const adminUrl = "/api/v1/admin";
 const productRoutes = Router();
 
 // Public
-productRoutes.get(`${publicUrl}/products/`, productController.get);
+productRoutes.get(`${publicUrl}/products/`, productController.getPublic);
 // productRoutes.get(`${publicUrl}/product/detail/:id`, productController.detail);
 
 // Admin
@@ -22,6 +22,7 @@ productRoutes.post(
   authMiddleware,
   productController.add
 );
+
 // productRoutes.get(
 //   `${adminUrl}/products/detail/:id`,
 //   authMiddleware,

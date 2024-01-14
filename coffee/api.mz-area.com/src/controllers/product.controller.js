@@ -7,6 +7,7 @@ import District from "../models/District";
 import Village from "../models/Village";
 import Store from "../models/Store";
 import Category from "../models/Category";
+import SubCategory from "../models/SubCategory";
 import Product from "../models/Product";
 import ProductImages from "../models/ProductImage";
 
@@ -59,19 +60,20 @@ let productController = {
           return res.status(400).json({ error: "File upload error." });
         }
 
-        const createdBy = req.body.userId;
-        const updatedBy = req.body.userId;
+        const createdBy = parseInt(req.body.userId);
+        const updatedBy = parseInt(req.body.userId);
 
         const insertProduct = {
-          storeId: req.body.storeId,
-          categoryId: req.body.categoryId,
+          storeId: parseInt(req.body.storeId),
+          categoryId: parseInt(req.body.categoryId),
+          subCategoryId: parseInt(req.body.subCategoryId),
           name: req.body.name,
           slug: req.body.slug,
           altName: req.body.altName,
           description: req.body.description,
-          price: req.body.price,
-          published: req.body.published,
-          status: req.body.status,
+          price: parseInt(req.body.price),
+          published: parseInt(req.body.published),
+          status: parseInt(req.body.status),
           createdBy: createdBy,
           updatedBy: updatedBy,
         };
@@ -86,6 +88,8 @@ let productController = {
         //   updatedBy: updatedBy,
         // };
 
+        console.log(images);
+
         const insertImages = images.map((imageName) => ({
           productId: product.id,
           name: imageName,
@@ -96,6 +100,8 @@ let productController = {
         console.log(insertImages);
 
         const image = await ProductImages.bulkCreate(insertImages);
+
+        images.length = 0;
 
         const callback = {
           status: 200,
@@ -139,6 +145,10 @@ let productController = {
                 as: "category",
               },
               {
+                model: SubCategory,
+                as: "subcategory",
+              },
+              {
                 model: User,
                 as: "created",
               },
@@ -179,6 +189,10 @@ let productController = {
                 as: "category",
               },
               {
+                model: SubCategory,
+                as: "subcategory",
+              },
+              {
                 model: User,
                 as: "created",
               },
@@ -204,8 +218,8 @@ let productController = {
         address: product.address,
         official: product.official,
         owner: product.owner.name,
-        created: product.created.name,
-        updated: product.updated.name,
+        created: product.created === null ? null : product.created.name,
+        updated: product.updated === null ? null : product.updated.name,
         deleted: product.deleted === null ? null : product.deleted.name,
         province: product.province.name,
         city: product.city.name,
@@ -222,6 +236,133 @@ let productController = {
           totalPage: Math.floor(totalDocs / parseInt(req.query.limit)),
         },
       });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getPublic: async (req, res, next) => {
+    try {
+      const page = req.query.page ? parseInt(req.query.page) : null;
+      const totalDocs = await Product.count();
+
+      const pagination = () => {
+        if (req.query.paginate === "true") {
+          const limit = req.query.limit ? parseInt(req.query.limit) : 10;
+          const offset = limit * (page - 1);
+          const totalPage = totalDocs;
+
+          return {
+            page,
+            offset,
+            limit,
+            totalPage,
+            where: {
+              deletedAt: null,
+              deletedBy: null,
+            },
+            order: [["createdAt", "DESC"]],
+            include: [
+              {
+                model: Store,
+                as: "store",
+              },
+              {
+                model: Category,
+                as: "category",
+              },
+              {
+                model: SubCategory,
+                as: "subcategory",
+              },
+              {
+                model: User,
+                as: "created",
+              },
+              {
+                model: User,
+                as: "updated",
+              },
+              {
+                model: User,
+                as: "deleted",
+              },
+            ],
+          };
+        } else {
+          let query = {};
+          Object.keys(req.query)
+            .filter((item) => item != "paginate")
+            .map((item) => {
+              query = {
+                ...query,
+                [item]: {
+                  [Op.iLike]: `%${req.query[item]}%`,
+                },
+              };
+            });
+
+          return {
+            where: {
+              ...query,
+            },
+            include: [
+              {
+                model: Store,
+                as: "store",
+              },
+              {
+                model: Category,
+                as: "category",
+              },
+              {
+                model: SubCategory,
+                as: "subcategory",
+              },
+              {
+                model: User,
+                as: "created",
+              },
+              {
+                model: User,
+                as: "updated",
+              },
+              {
+                model: User,
+                as: "deleted",
+              },
+            ],
+          };
+        }
+      };
+
+      const data = await Product.findAll(pagination());
+
+      // const products = data.map((product) => ({
+      //   id: product.id,
+      //   name: product.name,
+      //   description: product.description,
+      //   address: product.address,
+      //   official: product.official,
+      //   owner: product.owner.name,
+      //   created: product.created === null ? null : product.created.name,
+      //   updated: product.updated === null ? null : product.updated.name,
+      //   deleted: product.deleted === null ? null : product.deleted.name,
+      //   province: product.province.name,
+      //   city: product.city.name,
+      //   district: product.district.name,
+      //   village: product.village.name,
+      // }));
+
+      // return res.status(200).json({
+      //   data: {
+      //     docs: products,
+      //     totalDocs: totalDocs,
+      //     page: page,
+      //     limit: parseInt(req.query.limit),
+      //     totalPage: Math.floor(totalDocs / parseInt(req.query.limit)),
+      //   },
+      // });
     } catch (error) {
       next(error);
     }

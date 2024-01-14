@@ -9,6 +9,14 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      userId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Users",
+          key: "id",
+        },
+      },
       provinceId: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -30,6 +38,14 @@ module.exports = {
         allowNull: false,
         references: {
           model: "Districts",
+          key: "id",
+        },
+      },
+      villageId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Villages",
           key: "id",
         },
       },
