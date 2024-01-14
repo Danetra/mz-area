@@ -5,7 +5,7 @@ URL Production:
 [BACKEND](http://api.mz-area.com/)
 
 
-## Getting Started
+## Postman
 
 Clone the repository
 
