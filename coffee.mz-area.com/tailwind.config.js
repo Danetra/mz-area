@@ -2,8 +2,11 @@
 module.exports = {
   content: ["./src/**/*.{html,js,jsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        mzarea: ["SF Pro Display", "sans-serif"],
+      },
+    },
   },
   plugins: [],
-}
-
+};

@@ -9,7 +9,7 @@ const storeRoutes = Router();
 
 // Public
 storeRoutes.get(`${publicUrl}/store/`, storeController.get);
-storeRoutes.get(`${publicUrl}/store/detail/:id`, storeController.detail);
+storeRoutes.get(`${publicUrl}/store/detail/:id`, storeController.getStoreById);
 
 // Admin
 storeRoutes.get(`${adminUrl}/store/`, authMiddleware, storeController.get);
@@ -17,7 +17,7 @@ storeRoutes.post(`${adminUrl}/store/add`, authMiddleware, storeController.add);
 storeRoutes.get(
   `${adminUrl}/store/detail/:id`,
   authMiddleware,
-  storeController.detail
+  storeController.getStoreById
 );
 storeRoutes.put(
   `${adminUrl}/store/update`,

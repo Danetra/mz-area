@@ -271,6 +271,167 @@ let productController = {
     }
   },
 
+  getPublic: async (req, res, next) => {
+    try {
+      const page = req.query.page ? parseInt(req.query.page) : null;
+      const totalDocs = await Product.count();
+
+      const pagination = () => {
+        if (req.query.paginate === "true") {
+          const limit = req.query.limit ? parseInt(req.query.limit) : 10;
+          const offset = limit * (page - 1);
+          const totalPage = totalDocs;
+
+          return {
+            page,
+            offset,
+            limit,
+            totalPage,
+            where: {
+              published: 1,
+              deletedAt: null,
+              deletedBy: null,
+            },
+            order: [["createdAt", "DESC"]],
+            include: [
+              {
+                model: Store,
+                as: "store",
+              },
+              {
+                model: Category,
+                as: "category",
+              },
+              {
+                model: SubCategory,
+                as: "subcategory",
+              },
+              {
+                model: User,
+                as: "created",
+              },
+              {
+                model: User,
+                as: "updated",
+              },
+              {
+                model: User,
+                as: "deleted",
+              },
+            ],
+          };
+        } else {
+          let query = {};
+          Object.keys(req.query)
+            .filter((item) => item != "paginate")
+            .map((item) => {
+              query = {
+                ...query,
+                [item]: {
+                  [Op.iLike]: `%${req.query[item]}%`,
+                },
+              };
+            });
+
+          return {
+            where: {
+              ...query,
+              published: 1,
+            },
+            include: [
+              {
+                model: Store,
+                as: "store",
+              },
+              {
+                model: Category,
+                as: "category",
+              },
+              {
+                model: SubCategory,
+                as: "subcategory",
+              },
+              {
+                model: User,
+                as: "created",
+              },
+              {
+                model: User,
+                as: "updated",
+              },
+              {
+                model: User,
+                as: "deleted",
+              },
+            ],
+          };
+        }
+      };
+
+      const data = await Product.findAll(pagination());
+
+      const products = await Promise.all(
+        data.map(async (product) => {
+          const images = await ProductImages.findAll({
+            where: { productId: product.id },
+          });
+
+          const imagesUrl = images.map((image) => {
+            const imageUrl = url.resolve(
+              req.protocol + "://" + req.get("host"),
+              `/assets/img/products/${image.name}`
+            );
+
+            const formImage = {
+              id: image.id,
+              url: imageUrl,
+            };
+            return formImage;
+          });
+
+          const full = {
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            price: product.price,
+            description: product.description,
+            published: product.published === 1 ? "PUBLISHED" : "DRAFT",
+            images: imagesUrl,
+            store: {
+              name: product.store === null ? null : product.store.name,
+              slug: product.store === null ? null : product.store.slug,
+              official: product.store.official,
+              address: product.store.address,
+              province: product.store.provinceId,
+              city: product.store.cityId,
+              district: product.store.districtId,
+              village: product.store.villageId,
+            },
+            created: product.created === null ? null : product.created.name,
+            updated: product.updated === null ? null : product.updated.name,
+            deleted: product.deleted === null ? null : product.deleted.name,
+          };
+
+          return full;
+        })
+      );
+
+      // console.log(products);
+
+      return res.status(200).json({
+        data: {
+          docs: products,
+          totalDocs: totalDocs,
+          page: page,
+          limit: parseInt(req.query.limit),
+          totalPage: Math.floor(totalDocs / parseInt(req.query.limit)),
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   getProductById: async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -335,6 +496,106 @@ let productController = {
             id: product.id,
             name: product.name,
             slug: product.slug,
+            category: product.category.name,
+            subCategory: product.subcategory.name,
+            price: product.price,
+            description: product.description,
+            published: product.published === 1 ? "PUBLISHED" : "DRAFT",
+            images: imagesUrl,
+            store: {
+              name: product.store === null ? null : product.store.name,
+              slug: product.store === null ? null : product.store.slug,
+              official: product.store.official,
+              address: product.store.address,
+              province: product.store.provinceId,
+              city: product.store.cityId,
+              district: product.store.districtId,
+              village: product.store.villageId,
+            },
+            created: product.created === null ? null : product.created.name,
+            updated: product.updated === null ? null : product.updated.name,
+            deleted: product.deleted === null ? null : product.deleted.name,
+          };
+
+          return full;
+        })
+      );
+
+      return res.status(200).send({
+        status: 200,
+        data: products,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getProductByIdPublic: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      const data = await Product.findAll({
+        where: { id: id, published: 1 },
+        include: [
+          {
+            model: Store,
+            as: "store",
+          },
+          {
+            model: Category,
+            as: "category",
+          },
+          {
+            model: SubCategory,
+            as: "subcategory",
+          },
+          {
+            model: User,
+            as: "created",
+          },
+          {
+            model: User,
+            as: "updated",
+          },
+          {
+            model: User,
+            as: "deleted",
+          },
+        ],
+      });
+
+      if (!data)
+        return res
+          .status(404)
+          .send({ status: 404, message: "Product is Not Exist" });
+
+      data.map((store) => {
+        if (store.deletedAt != null || store.deletedBy != null)
+          return res
+            .status(400)
+            .send({ status: 404, message: "Product was deleted" });
+      });
+
+      const products = await Promise.all(
+        data.map(async (product) => {
+          const images = await ProductImages.findAll({
+            where: { productId: product.id },
+          });
+
+          const imagesUrl = images.map((image) => {
+            const imageUrl = url.resolve(
+              req.protocol + "://" + req.get("host"),
+              `/assets/img/products/${image.name}`
+            );
+            return imageUrl;
+          });
+
+          const full = {
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            category: product.category.name,
+            subCategory: product.subcategory.name,
             price: product.price,
             description: product.description,
             published: product.published === 1 ? "PUBLISHED" : "DRAFT",

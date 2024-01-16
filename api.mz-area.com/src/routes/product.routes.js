@@ -8,14 +8,10 @@ const adminUrl = "/api/v1/admin";
 const productRoutes = Router();
 
 // Public
-productRoutes.get(`${publicUrl}/products/`, productController.get);
+productRoutes.get(`${publicUrl}/products/`, productController.getPublic);
 productRoutes.get(
   `${publicUrl}/products/detail/:id`,
-  productController.getProductById
-);
-productRoutes.get(
-  `${publicUrl}/products/edit/:id`,
-  productController.getProductById
+  productController.getProductByIdPublic
 );
 
 // Admin

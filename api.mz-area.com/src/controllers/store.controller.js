@@ -7,6 +7,15 @@ import District from "../models/District";
 import Village from "../models/Village";
 import Store from "../models/Store";
 import Product from "../models/Product";
+import Category from "../models/Category";
+import SubCategory from "../models/SubCategory";
+import ProductImages from "../models/ProductImage";
+
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import url from "url";
+
 import { Op, Sequelize } from "sequelize";
 import {
   BadRequestError,
@@ -208,7 +217,7 @@ let storeController = {
     }
   },
 
-  detail: async (req, res, next) => {
+  getStoreById: async (req, res, next) => {
     try {
       const { id } = req.params;
 
@@ -262,23 +271,80 @@ let storeController = {
             .send({ status: 404, message: "Store was deleted" });
       });
 
-      const products = await Product.findAll({ where: { storeId: id } });
+      const data = await Product.findAll({
+        where: { storeId: id },
+        include: [
+          {
+            model: Store,
+            as: "store",
+          },
+          {
+            model: Category,
+            as: "category",
+          },
+          {
+            model: SubCategory,
+            as: "subcategory",
+          },
+          {
+            model: User,
+            as: "created",
+          },
+          {
+            model: User,
+            as: "updated",
+          },
+          {
+            model: User,
+            as: "deleted",
+          },
+        ],
+      });
 
-      const product = products.map((product) => ({
-        id: product.id,
-        name: product.name,
-        altName: product.altName,
-        slug: product.slug,
-        description: product.description,
-        price: product.price,
-        published: product.published === 1 ? "PUBLISHED" : "DRAFT",
-        status: product.status === 1 ? "READY" : "UNREADY",
-        createdAt: product.createdAt,
-        modifiedAt:
-          product.updatedAt === product.createdAt ? null : product.updatedAt,
-      }));
+      const products = await Promise.all(
+        data.map(async (product) => {
+          const images = await ProductImages.findAll({
+            where: { productId: product.id },
+          });
 
-      const stores = store.map((store) => ({
+          const imagesUrl = images.map((image) => {
+            const imageUrl = url.resolve(
+              req.protocol + "://" + req.get("host"),
+              `/assets/img/products/${image.name}`
+            );
+            return imageUrl;
+          });
+
+          const full = {
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            category: product.category.name,
+            subCategory: product.subcategory.name,
+            price: product.price,
+            description: product.description,
+            published: product.published === 1 ? "PUBLISHED" : "DRAFT",
+            images: imagesUrl,
+            store: {
+              name: product.store === null ? null : product.store.name,
+              slug: product.store === null ? null : product.store.slug,
+              official: product.store.official,
+              address: product.store.address,
+              province: product.store.provinceId,
+              city: product.store.cityId,
+              district: product.store.districtId,
+              village: product.store.villageId,
+            },
+            created: product.created === null ? null : product.created.name,
+            updated: product.updated === null ? null : product.updated.name,
+            deleted: product.deleted === null ? null : product.deleted.name,
+          };
+
+          return full;
+        })
+      );
+
+      const stores = await store.map((store) => ({
         id: store.id,
         name: store.name,
         description: store.description,
@@ -292,7 +358,7 @@ let storeController = {
         city: store.city.name,
         district: store.district.name,
         village: store.village.name,
-        products: product,
+        products: products,
       }));
 
       return res.status(200).send({

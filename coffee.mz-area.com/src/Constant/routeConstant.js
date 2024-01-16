@@ -1,9 +1,23 @@
 export const ROUTES = {
-    PUBLIC: {
-        HOME: "/",
+  PUBLIC: {
+    HOME: "/",
+    PRODUCT: {
+      LIST: "/products",
+      DETAIL: "/products/detail/",
     },
-    LOGIN: "/administrator/login",
+    LOGIN: "/login",
+  },
+  AUTH: {
     ADMIN: {
-        DASHBOARD: "/administrator"
-    }
+      DASHBOARD: "/administrator",
+    },
+    BUYER: {
+      PRODUCT: {
+        LIST: "/products",
+        DETAIL: "/products/detail/",
+      },
+    },
+  },
 };
+
+export default ROUTES;
