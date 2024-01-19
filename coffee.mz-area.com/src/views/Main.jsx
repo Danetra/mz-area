@@ -7,7 +7,7 @@ import List from "./public/Products/List";
 
 const Main = () => {
   return (
-    <div className="w-[100vw] h-[100vh] max-w-[100vw] max-h-[100vh] overflow-auto">
+    <div className="w-[100vw] h-full max-w-[100vw] max-h-[100vh] overflow-auto">
       <ToastContainer />
       <Routes>
         <Route element={<Home />} path={ROUTES.PUBLIC.HOME} exact />

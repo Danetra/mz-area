@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import { Swiper, SwiperSlide } from "swiper/react";
 import NavbarProducts from "./Navbar/NavbarProducts";
+import { ROUTES } from "../../../Constant/routeConstant";
 
 import "swiper/css";
 import "swiper/swiper-bundle.css";
@@ -12,6 +13,7 @@ import product1 from "../../../assets/img/product1.jpg";
 import logoStore from "../../../assets/img/store.png";
 
 const Home = () => {
+  const navigate = useNavigate();
   return (
     <div className="bg-[#EFEFEF]">
       <NavbarProducts />
@@ -36,7 +38,12 @@ const Home = () => {
         </div>
 
         <section id="highlight" className="mt-[100px]">
-          <h3 className="font-mzarea px-[80px] text-right cursor-pointer">
+          <h3
+            className="font-mzarea px-[80px] text-right cursor-pointer"
+            onClick={() => {
+              navigate(ROUTES.PUBLIC.PRODUCT.LIST);
+            }}
+          >
             See All
           </h3>
           <div className="grid justify-center items-center sm:grid-cols-2 lg:grid-cols-4 gap-4 px-[80px] py-8">
