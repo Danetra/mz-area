@@ -4,6 +4,8 @@ import { ToastContainer } from "react-toastify";
 import Login from "./public/Login/Login";
 import Home from "./public/Products/Home";
 import List from "./public/Products/List";
+import Detail from "./public/Products/Detail";
+import Cart from "./public/Products/Cart";
 
 const Main = () => {
   return (
@@ -12,6 +14,8 @@ const Main = () => {
       <Routes>
         <Route element={<Home />} path={ROUTES.PUBLIC.HOME} exact />
         <Route element={<List />} path={ROUTES.PUBLIC.PRODUCT.LIST} exact />
+        <Route element={<Detail />} path={ROUTES.PUBLIC.PRODUCT.DETAIL} exact />
+        <Route element={<Cart />} path={ROUTES.PUBLIC.PRODUCT.CART} exact />
         <Route element={<Login />} path={ROUTES.PUBLIC.LOGIN} exact />
         {/* <Route
           element={<PrivateRoute children={<Dashboard />} />}

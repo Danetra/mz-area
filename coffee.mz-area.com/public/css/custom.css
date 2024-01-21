@@ -1,0 +1,71 @@
+.swiper-container {
+  width: 100%;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.swiper-button-prev,
+.swiper-container-rtl .swiper-button-next {
+  background-image: none;
+  content: "\E314";
+  display: block;
+  position: absolute;
+  font-family: "Material Icons";
+  font-size: 50px;
+  color: red;
+}
+
+.swiper-button-next,
+.swiper-container-rtl .swiper-button-prev {
+  background-image: none;
+  content: "\E315";
+  display: block;
+  position: absolute;
+  font-family: "Material Icons";
+  font-size: 50px;
+  color: red;
+}
+
+#swiper-homepage .swiper-pagination {
+  bottom: 30px;
+}
+
+#swiper-homepage .swiper-pagination .swiper-pagination-bullet-active {
+  background: #ffffff;
+}
+
+#swiper-homepage .swiper-pagination-bullet {
+  background: #fff;
+  margin: 0 2px;
+  width: 8px;
+  height: 8px;
+}
+
+@media (max-width: 520px) {
+  .swiper-container .card-slider-4 {
+    margin-right: -18px;
+    margin-left: -18px;
+    width: calc(100% + 36px);
+  }
+
+  .swiper-slide {
+    width: 280px;
+
+    &:first-child {
+      margin-left: 18px;
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  #swiper-homepage .swiper-pagination {
+    bottom: 80px;
+  }
+
+  #swiper-homepage .swiper-pagination-bullet {
+    width: 12px;
+    height: 12px;
+    margin: 0 4px;
+  }
+}

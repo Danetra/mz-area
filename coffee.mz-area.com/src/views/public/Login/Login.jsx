@@ -11,7 +11,7 @@ const Login = () => {
         <img
           src={LoginLogo}
           alt="login-logo"
-          className="object-cover h-[100vh] w-full h-full"
+          className="object-cover h-[100vh] w-full"
         />
       </div>
       <div className="lg:w-[50%] w-[80%] h-full flex flex-col items-center justify-center lg:pl-[-30px]">
