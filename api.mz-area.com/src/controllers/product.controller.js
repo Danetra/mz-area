@@ -8,8 +8,6 @@ import Product from "../models/Product";
 import ProductImages from "../models/ProductImage";
 
 import multer from "multer";
-import path from "path";
-import fs from "fs";
 import url from "url";
 
 import { Op, Sequelize } from "sequelize";
@@ -64,7 +62,6 @@ let productController = {
         const insertProduct = {
           storeId: parseInt(req.body.storeId),
           categoryId: parseInt(req.body.categoryId),
-          subCategoryId: parseInt(req.body.subCategoryId),
           name: req.body.name,
           slug: req.body.slug,
           altName: req.body.altName,
@@ -85,8 +82,6 @@ let productController = {
         //   createdBy: createdBy,
         //   updatedBy: updatedBy,
         // };
-
-        console.log(images);
 
         const insertImages = images.map((imageName) => ({
           productId: product.id,
@@ -143,10 +138,6 @@ let productController = {
                 as: "category",
               },
               {
-                model: SubCategory,
-                as: "subcategory",
-              },
-              {
                 model: User,
                 as: "created",
               },
@@ -187,10 +178,6 @@ let productController = {
                 as: "category",
               },
               {
-                model: SubCategory,
-                as: "subcategory",
-              },
-              {
                 model: User,
                 as: "created",
               },
@@ -215,6 +202,19 @@ let productController = {
             where: { productId: product.id },
           });
 
+          const subsCat = await SubCategory.findAll({
+            where: { categoryId: product.categoryId },
+          });
+
+          const subCat = subsCat.map((sc) => {
+            const datCat = {
+              id: sc.id,
+              name: sc.name,
+            };
+
+            return datCat;
+          });
+
           const imagesUrl = images.map((image) => {
             const imageUrl = url.resolve(
               req.protocol + "://" + req.get("host"),
@@ -232,6 +232,11 @@ let productController = {
             id: product.id,
             name: product.name,
             slug: product.slug,
+            category: {
+              id: product.category.id,
+              name: product.category.name,
+            },
+            subcategory: subCat,
             price: product.price,
             description: product.description,
             published: product.published === 1 ? "PUBLISHED" : "DRAFT",
@@ -288,7 +293,6 @@ let productController = {
             limit,
             totalPage,
             where: {
-              published: 1,
               deletedAt: null,
               deletedBy: null,
             },
@@ -301,10 +305,6 @@ let productController = {
               {
                 model: Category,
                 as: "category",
-              },
-              {
-                model: SubCategory,
-                as: "subcategory",
               },
               {
                 model: User,
@@ -336,7 +336,6 @@ let productController = {
           return {
             where: {
               ...query,
-              published: 1,
             },
             include: [
               {
@@ -346,10 +345,6 @@ let productController = {
               {
                 model: Category,
                 as: "category",
-              },
-              {
-                model: SubCategory,
-                as: "subcategory",
               },
               {
                 model: User,
@@ -376,6 +371,21 @@ let productController = {
             where: { productId: product.id },
           });
 
+          const subsCat = await SubCategory.findAll({
+            where: { categoryId: product.categoryId },
+          });
+
+          console.log(subsCat);
+
+          const subCat = subsCat.map((sc) => {
+            const datCat = {
+              id: sc.id,
+              name: sc.name,
+            };
+
+            return datCat;
+          });
+
           const imagesUrl = images.map((image) => {
             const imageUrl = url.resolve(
               req.protocol + "://" + req.get("host"),
@@ -393,6 +403,11 @@ let productController = {
             id: product.id,
             name: product.name,
             slug: product.slug,
+            category: {
+              id: product.category.id,
+              name: product.category.name,
+            },
+            subcategory: subCat,
             price: product.price,
             description: product.description,
             published: product.published === 1 ? "PUBLISHED" : "DRAFT",
@@ -448,10 +463,6 @@ let productController = {
             as: "category",
           },
           {
-            model: SubCategory,
-            as: "subcategory",
-          },
-          {
             model: User,
             as: "created",
           },
@@ -484,6 +495,21 @@ let productController = {
             where: { productId: product.id },
           });
 
+          const subsCat = await SubCategory.findAll({
+            where: { categoryId: product.categoryId },
+          });
+
+          console.log(subsCat);
+
+          const subCat = subsCat.map((sc) => {
+            const datCat = {
+              id: sc.id,
+              name: sc.name,
+            };
+
+            return datCat;
+          });
+
           const imagesUrl = images.map((image) => {
             const imageUrl = url.resolve(
               req.protocol + "://" + req.get("host"),
@@ -496,8 +522,11 @@ let productController = {
             id: product.id,
             name: product.name,
             slug: product.slug,
-            category: product.category.name,
-            subCategory: product.subcategory.name,
+            category: {
+              id: product.category.id,
+              name: product.category.name,
+            },
+            subCategory: subCat,
             price: product.price,
             description: product.description,
             published: product.published === 1 ? "PUBLISHED" : "DRAFT",
@@ -535,7 +564,7 @@ let productController = {
       const { id } = req.params;
 
       const data = await Product.findAll({
-        where: { id: id, published: 1 },
+        where: { id: id },
         include: [
           {
             model: Store,
@@ -544,10 +573,6 @@ let productController = {
           {
             model: Category,
             as: "category",
-          },
-          {
-            model: SubCategory,
-            as: "subcategory",
           },
           {
             model: User,
@@ -582,6 +607,21 @@ let productController = {
             where: { productId: product.id },
           });
 
+          const subsCat = await SubCategory.findAll({
+            where: { categoryId: product.categoryId },
+          });
+
+          console.log(subsCat);
+
+          const subCat = subsCat.map((sc) => {
+            const datCat = {
+              id: sc.id,
+              name: sc.name,
+            };
+
+            return datCat;
+          });
+
           const imagesUrl = images.map((image) => {
             const imageUrl = url.resolve(
               req.protocol + "://" + req.get("host"),
@@ -594,8 +634,11 @@ let productController = {
             id: product.id,
             name: product.name,
             slug: product.slug,
-            category: product.category.name,
-            subCategory: product.subcategory.name,
+            category: {
+              id: product.category.id,
+              name: product.category.name,
+            },
+            subCategory: subCat,
             price: product.price,
             description: product.description,
             published: product.published === 1 ? "PUBLISHED" : "DRAFT",

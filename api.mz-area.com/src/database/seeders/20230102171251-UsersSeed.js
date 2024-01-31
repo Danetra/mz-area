@@ -25,6 +25,24 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          id: 2,
+          name: "Daniel Eka Putra",
+          username: "danetra05",
+          email: "danetra05@gmail.com",
+          password: bcrypt.hashSync("daniel123", 10),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 3,
+          name: "Evelyn",
+          username: "evelyn",
+          email: "evelyn@kaffearea.com",
+          password: bcrypt.hashSync("evelyn123", 10),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {}
     );

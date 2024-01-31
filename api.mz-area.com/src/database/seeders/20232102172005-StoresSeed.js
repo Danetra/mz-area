@@ -36,7 +36,7 @@ module.exports = {
         {
           id: 2,
           websiteTypeId: 2,
-          userId: 1,
+          userId: 3,
           provinceId: 31,
           cityId: 3171,
           districtId: 3171060,
@@ -63,5 +63,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
+    await queryInterface.bulkDelete("Stores", null, {});
   },
 };

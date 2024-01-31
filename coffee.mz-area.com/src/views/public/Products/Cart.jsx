@@ -73,19 +73,21 @@ const Cart = () => {
                           alt="Product"
                         />
                       </div>
-                      <div className="mt-[10px]">
-                        <div className="font-mzarea text-[15px] text-lg font-bold text-black uppercase">
-                          Caramel Macchiato
+                      <div className="flex">
+                        <div className="w-1/2 mt-[10px]">
+                          <div className="font-mzarea text-[15px] text-lg font-bold text-black uppercase">
+                            Caramel Macchiato
+                          </div>
+                          <div className="font-mzarea text-[15px] text-[#979797] text-lg font-regular text-black uppercase">
+                            Coffee - Iced
+                          </div>
                         </div>
-                        <div className="font-mzarea text-[15px] text-[#979797] text-lg font-regular text-black uppercase">
-                          Coffee - Iced
+                        <div className="w-1/2 items-right mt-[10px] justify-end">
+                          <div className="font-mzarea text-[15px] text-lg font-bold text-black">
+                            Rp32.000
+                          </div>
+                          <div className="font-mzarea text-[15px] text-[#979797] text-lg font-regular text-black"></div>
                         </div>
-                      </div>
-                      <div className="items-right ml-[300px] mt-[10px] justify-end">
-                        <div className="font-mzarea text-[15px] text-lg font-bold text-black">
-                          Rp32.000
-                        </div>
-                        <div className="font-mzarea text-[15px] text-[#979797] text-lg font-regular text-black"></div>
                       </div>
                     </div>
 

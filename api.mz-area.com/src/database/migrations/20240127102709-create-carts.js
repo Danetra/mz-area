@@ -9,12 +9,36 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    queryInterface.createTable("ProductImages", {
+    queryInterface.createTable("Carts", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
+      },
+      menuCategoryId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "MenuCategories",
+          key: "id",
+        },
+      },
+      categoryId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "CategoryProducts",
+          key: "id",
+        },
+      },
+      subCategoryId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "SubCategoryProducts",
+          key: "id",
+        },
       },
       productId: {
         type: Sequelize.INTEGER,
@@ -24,13 +48,26 @@ module.exports = {
           key: "id",
         },
       },
-      name: {
-        allowNull: false,
-        type: Sequelize.STRING,
-      },
-      thumbnail: {
-        allowNull: true,
+      storeId: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Stores",
+          key: "id",
+        },
+      },
+      userId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Stores",
+          key: "id",
+        },
+      },
+      qty: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        defaultValue: 1,
       },
       createdAt: {
         allowNull: false,
@@ -81,6 +118,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    queryInterface.dropTable("ProductImages");
+    queryInterface.dropTable("Carts");
   },
 };

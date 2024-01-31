@@ -10,6 +10,7 @@ import Product from "../models/Product";
 import Category from "../models/Category";
 import SubCategory from "../models/SubCategory";
 import ProductImages from "../models/ProductImage";
+import WebsiteType from "../models/WebsiteType";
 
 import multer from "multer";
 import path from "path";
@@ -28,6 +29,7 @@ let storeController = {
     try {
       const validated = Yup.object().shape({
         userId: Yup.number().required(),
+        websiteTypeId: Yup.number().required(),
         provinceId: Yup.number().required(),
         cityId: Yup.number().required(),
         districtId: Yup.number().required(),
@@ -128,6 +130,10 @@ let storeController = {
                 model: Village,
                 as: "village",
               },
+              {
+                model: WebsiteType,
+                as: "websiteType",
+              },
             ],
           };
         } else {
@@ -180,6 +186,10 @@ let storeController = {
                 model: Village,
                 as: "village",
               },
+              {
+                model: WebsiteType,
+                as: "websiteType",
+              },
             ],
           };
         }
@@ -189,6 +199,7 @@ let storeController = {
 
       const stores = data.map((store) => ({
         id: store.id,
+        wesbiteType: store.websiteType.name,
         name: store.name,
         description: store.description,
         address: store.address,
@@ -283,10 +294,6 @@ let storeController = {
             as: "category",
           },
           {
-            model: SubCategory,
-            as: "subcategory",
-          },
-          {
             model: User,
             as: "created",
           },
@@ -307,6 +314,19 @@ let storeController = {
             where: { productId: product.id },
           });
 
+          const subsCat = await SubCategory.findAll({
+            where: { categoryId: product.categoryId },
+          });
+
+          const subCat = subsCat.map((sc) => {
+            const datCat = {
+              id: sc.id,
+              name: sc.name,
+            };
+
+            return datCat;
+          });
+
           const imagesUrl = images.map((image) => {
             const imageUrl = url.resolve(
               req.protocol + "://" + req.get("host"),
@@ -319,8 +339,11 @@ let storeController = {
             id: product.id,
             name: product.name,
             slug: product.slug,
-            category: product.category.name,
-            subCategory: product.subcategory.name,
+            category: {
+              id: product.category.id,
+              name: product.category.name,
+            },
+            subcategory: subCat,
             price: product.price,
             description: product.description,
             published: product.published === 1 ? "PUBLISHED" : "DRAFT",

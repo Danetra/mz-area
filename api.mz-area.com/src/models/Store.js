@@ -4,18 +4,20 @@ import Province from "./Province";
 import City from "./City";
 import District from "./District";
 import Village from "./Village";
+import WebsiteType from "./WebsiteType";
 
 class Store extends Model {
   static init(sequelize) {
     super.init(
       {
-        name: Sequelize.STRING,
-        slug: Sequelize.STRING,
+        websiteTypeId: Sequelize.INTEGER,
         userId: Sequelize.INTEGER,
         provinceId: Sequelize.BIGINT,
         cityId: Sequelize.BIGINT,
         districtId: Sequelize.BIGINT,
         villageId: Sequelize.BIGINT,
+        name: Sequelize.STRING,
+        slug: Sequelize.STRING,
         official: Sequelize.INTEGER,
         address: Sequelize.TEXT,
         description: Sequelize.TEXT,
@@ -46,6 +48,10 @@ class Store extends Model {
       as: "district",
     });
     Store.belongsTo(Village, { foreignKey: "villageId", as: "village" });
+    Store.belongsTo(WebsiteType, {
+      foreignKey: "websiteTypeId",
+      as: "websiteType",
+    });
   }
 }
 
