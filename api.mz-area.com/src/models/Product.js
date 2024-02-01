@@ -32,7 +32,7 @@ class Product extends Model {
         sequelize,
         timestamps: true,
         tableName: "Products",
-      }
+      },
     );
   }
 

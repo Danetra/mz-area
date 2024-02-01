@@ -4,7 +4,6 @@ const timeout = 3600;
 
 const login = (url, data, params) => {
   const method = "POST";
-
   return axios({ url, method, data, params, timeout });
 };
 

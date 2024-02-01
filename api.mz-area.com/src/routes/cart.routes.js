@@ -17,6 +17,11 @@ const cartRoutes = Router();
 // Admin
 cartRoutes.get(`${adminUrl}/carts/`, authMiddleware, cartController.get);
 cartRoutes.post(`${adminUrl}/carts/add`, authMiddleware, cartController.add);
+cartRoutes.put(
+  `${adminUrl}/carts/updateQty`,
+  authMiddleware,
+  cartController.updateQty
+);
 
 // cartRoutes.get(
 //   `${adminUrl}/products/detail/:id`,

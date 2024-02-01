@@ -3,8 +3,44 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import LoginLogo from "../../../assets/img/coffee.jpeg";
 import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
+import { loginAction } from "../../../service/authService";
+import { toast } from "react-toastify";
+import ROUTES from "../../../Constant/routeConstant";
 
 const Login = () => {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await loginAction({ data: formData });
+      console.log(response, "test response");
+      if (response.status === true) {
+        localStorage.setItem("token", response.data.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.data.user));
+        toast.success(response.data.message);
+        navigate(ROUTES.PUBLIC.HOME);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="w-full h-full bg-white flex flex-row items-center justify-center">
       <div className="lg:w-[100%] h-full w-0 ">
@@ -20,7 +56,7 @@ const Login = () => {
             LOG IN
           </p>
         </div>
-        <form className="lg:pl-6">
+        <form className="lg:pl-6" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-[24px] items-center justify-center lg:w-[400px]">
             <div className="w-full mx-3 flex flex-row items-center justify-start bg-white border border-slate-300 rounded-md text-[gray]">
               <div>{<FontAwesomeIcon icon={faUser} className="mx-3" />}</div>
@@ -29,7 +65,7 @@ const Login = () => {
                 className="font-mzarea font-bold bg-none outline-none border-none h-[40px] ml-3 w-full"
                 placeholder="EMAIL"
                 name="email"
-                // onChange={handleChange}
+                onChange={handleChange}
               />
             </div>
 
@@ -40,14 +76,8 @@ const Login = () => {
                 className="font-mzarea font-bold bg-none outline-none border-none h-[40px] ml-3 w-full"
                 placeholder="PASSWORD"
                 name="password"
-                // onChange={handleChange}
+                onChange={handleChange}
               />
-
-              {/* <div>
-                <p className="font-poppins text-[#A80000] text-[14px] font-light ">
-                  Belum Memiliki Akun?
-                </p>
-              </div> */}
             </div>
           </div>
           <button

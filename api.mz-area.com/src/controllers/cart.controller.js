@@ -34,20 +34,37 @@ let cartController = {
       const createdBy = parseInt(req.body.userId);
       const updatedBy = parseInt(req.body.userId);
 
-      const insertCart = {
-        ...req.body,
-        createdBy: createdBy,
-        updatedBy: updatedBy,
-      };
+      const { productId, qty } = req.body;
 
-      const cart = await Cart.create(insertCart);
+      const check = await Cart.findAll({ where: { productId: productId } });
 
-      const callback = {
-        status: 200,
-        message: "Input Success",
-      };
+      if (check.length > 0) {
+        const updatedQty = check[0].qty + 1;
 
-      if (cart) return res.status(200).json(callback);
+        await check[0].update({ qty: updatedQty, updatedBy: updatedBy });
+
+        const callback = {
+          status: 200,
+          message: "Input Success",
+        };
+
+        return res.status(200).json(callback);
+      } else {
+        const insertCart = {
+          ...req.body,
+          createdBy: createdBy,
+          updatedBy: updatedBy,
+        };
+
+        const cart = await Cart.create(insertCart);
+
+        const callback = {
+          status: 200,
+          message: "Input Success",
+        };
+
+        if (cart) return res.status(200).json(callback);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -132,8 +149,6 @@ let cartController = {
             where: { id: subCategoryId },
           });
 
-          console.log(subsCat);
-
           const subCat = subsCat.map((sc) => {
             const datCat = {
               id: sc.id,
@@ -201,6 +216,34 @@ let cartController = {
           totalPage: Math.floor(totalDocs / parseInt(req.query.limit)),
         },
       });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  updateQty: async (req, res, next) => {
+    try {
+      const updatedBy = parseInt(req.body.userId);
+
+      const { productId, qty, storeId } = req.body;
+
+      const check = await Cart.findOne({
+        where: { productId: productId, storeId: storeId },
+      });
+
+      if (check) {
+        const updatedQty = await check.update({
+          qty: qty,
+          updatedBy: updatedBy,
+        });
+
+        const callback = {
+          status: 200,
+          message: "Input Success",
+        };
+
+        if (updatedQty) return res.status(200).json(callback);
+      }
     } catch (error) {
       next(error);
     }

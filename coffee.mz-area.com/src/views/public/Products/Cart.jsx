@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleCheck, faCreditCard } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCircleCheck,
+  faCreditCard,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
 import { Swiper, SwiperSlide } from "swiper/react";
 import NavbarProducts from "./Navbar/NavbarProducts";
 import { ROUTES } from "../../../Constant/routeConstant";

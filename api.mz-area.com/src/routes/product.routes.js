@@ -10,38 +10,38 @@ const productRoutes = Router();
 // Public
 productRoutes.get(`${publicUrl}/products/`, productController.getPublic);
 productRoutes.get(
-  `${publicUrl}/products/detail/:id`,
-  productController.getProductByIdPublic
+  `${publicUrl}/products/detail/`,
+  productController.getProductByIdPublic,
 );
 
 // Admin
 productRoutes.get(
   `${adminUrl}/products/`,
   authMiddleware,
-  productController.get
+  productController.get,
 );
 productRoutes.post(
   `${adminUrl}/products/add`,
   authMiddleware,
-  productController.add
+  productController.add,
 );
 
 productRoutes.get(
   `${adminUrl}/products/detail/:id`,
   authMiddleware,
-  productController.getProductById
+  productController.getProductById,
 );
 
 productRoutes.get(
   `${adminUrl}/products/edit/:id`,
   authMiddleware,
-  productController.getProductById
+  productController.getProductById,
 );
 
 productRoutes.put(
   `${adminUrl}/products/update`,
   authMiddleware,
-  productController.updateProduct
+  productController.updateProduct,
 );
 
 // productRoutes.delete(

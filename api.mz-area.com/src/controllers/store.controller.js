@@ -28,8 +28,8 @@ let storeController = {
   add: async (req, res, next) => {
     try {
       const validated = Yup.object().shape({
-        userId: Yup.number().required(),
         websiteTypeId: Yup.number().required(),
+        userId: Yup.number().required(),
         provinceId: Yup.number().required(),
         cityId: Yup.number().required(),
         districtId: Yup.number().required(),

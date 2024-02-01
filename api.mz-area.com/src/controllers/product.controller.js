@@ -6,6 +6,8 @@ import Category from "../models/Category";
 import SubCategory from "../models/SubCategory";
 import Product from "../models/Product";
 import ProductImages from "../models/ProductImage";
+import Province from "../models/Province";
+import City from "../models/City";
 
 import multer from "multer";
 import url from "url";
@@ -218,7 +220,7 @@ let productController = {
           const imagesUrl = images.map((image) => {
             const imageUrl = url.resolve(
               req.protocol + "://" + req.get("host"),
-              `/assets/img/products/${image.name}`
+              `/assets/img/products/${image.name}`,
             );
 
             const formImage = {
@@ -257,7 +259,7 @@ let productController = {
           };
 
           return full;
-        })
+        }),
       );
 
       // console.log(products);
@@ -389,7 +391,7 @@ let productController = {
           const imagesUrl = images.map((image) => {
             const imageUrl = url.resolve(
               req.protocol + "://" + req.get("host"),
-              `/assets/img/products/${image.name}`
+              `/assets/img/products/${image.name}`,
             );
 
             const formImage = {
@@ -428,7 +430,7 @@ let productController = {
           };
 
           return full;
-        })
+        }),
       );
 
       // console.log(products);
@@ -513,7 +515,7 @@ let productController = {
           const imagesUrl = images.map((image) => {
             const imageUrl = url.resolve(
               req.protocol + "://" + req.get("host"),
-              `/assets/img/products/${image.name}`
+              `/assets/img/products/${image.name}`,
             );
             return imageUrl;
           });
@@ -547,7 +549,7 @@ let productController = {
           };
 
           return full;
-        })
+        }),
       );
 
       return res.status(200).send({
@@ -561,10 +563,11 @@ let productController = {
 
   getProductByIdPublic: async (req, res, next) => {
     try {
-      const { id } = req.params;
+      // const { id } = req.params;
+      const { slug } = req.query;
 
       const data = await Product.findAll({
-        where: { id: id },
+        where: { slug: slug },
         include: [
           {
             model: Store,
@@ -611,8 +614,6 @@ let productController = {
             where: { categoryId: product.categoryId },
           });
 
-          console.log(subsCat);
-
           const subCat = subsCat.map((sc) => {
             const datCat = {
               id: sc.id,
@@ -622,10 +623,24 @@ let productController = {
             return datCat;
           });
 
+          const prov = await Province.findByPk(product.store.provinceId);
+
+          const province = {
+            id: prov.id,
+            name: prov.name,
+          };
+
+          const cty = await City.findByPk(product.store.cityId);
+
+          const city = {
+            id: cty.id,
+            name: cty.name,
+          };
+
           const imagesUrl = images.map((image) => {
             const imageUrl = url.resolve(
               req.protocol + "://" + req.get("host"),
-              `/assets/img/products/${image.name}`
+              `/assets/img/products/${image.name}`,
             );
             return imageUrl;
           });
@@ -648,8 +663,8 @@ let productController = {
               slug: product.store === null ? null : product.store.slug,
               official: product.store.official,
               address: product.store.address,
-              province: product.store.provinceId,
-              city: product.store.cityId,
+              province: province,
+              city: city,
               district: product.store.districtId,
               village: product.store.villageId,
             },
@@ -659,7 +674,7 @@ let productController = {
           };
 
           return full;
-        })
+        }),
       );
 
       return res.status(200).send({
@@ -702,13 +717,13 @@ let productController = {
               };
 
               const existingImage = await ProductImages.findByPk(
-                imagesLatestId
+                imagesLatestId,
               );
 
               if (existingImage) {
                 const updatedImage = await existingImage.update(formImage);
               }
-            })
+            }),
           );
         }
 

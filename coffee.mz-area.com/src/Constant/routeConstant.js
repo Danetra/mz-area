@@ -3,8 +3,8 @@ export const ROUTES = {
     HOME: "/",
     PRODUCT: {
       LIST: "/products",
-      DETAIL: "/products/detail/",
-      CART: "/products/carts",
+      DETAIL: "/products/detail",
+      CARTS: "/products/carts",
     },
     LOGIN: "/login",
   },
@@ -15,7 +15,7 @@ export const ROUTES = {
     BUYER: {
       PRODUCT: {
         LIST: "/products",
-        DETAIL: "/products/detail/",
+        DETAIL: "/products/detail",
       },
     },
   },
